@@ -1,4 +1,6 @@
+ Simulimi i rrjetit LTE me qellim analizimin e parametrave QoS
 # LTE Network Simulation using NS3
+
 
 ## 1. Configuration of LTE Network lte_basic.cc
 
