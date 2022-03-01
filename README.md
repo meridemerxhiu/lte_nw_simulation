@@ -16,7 +16,7 @@ in ns3 found in path
 10. In the configuration file `lte_basic.cc` we set a lte1.xml file in order to generate the communication scenario. Import this file in `NetAnim`
 GUI interface to see visualy the simulation
 
-<img src="https://user-images.githubusercontent.com/80008808/156177320-7a380779-78dd-47df-9653-bcd313d999cb.png" alt="drawing" width="500"/>  <img src="https://user-images.githubusercontent.com/80008808/156177556-f50db0b9-a88e-4126-977a-c9e54ad81bb6.png" alt="drawing" width="500"/>
+<img src="https://user-images.githubusercontent.com/80008808/156177320-7a380779-78dd-47df-9653-bcd313d999cb.png" alt="drawing" width="400"/>  <img src="https://user-images.githubusercontent.com/80008808/156177556-f50db0b9-a88e-4126-977a-c9e54ad81bb6.png" alt="drawing" width="400"/>
 
 ## 2. Configuration of Handover Scenario
 
@@ -30,7 +30,7 @@ GUI interface to see visualy the simulation
       - Function to notify when the handover stops/ends
 4. Handover starts when  UE node starts receiving signals of better signal strength from an eNodeB other than the one by which it was being served. The handover takes a miniscule amount of time to successfully get completed and after the handover takes place, the UE node has now successfully established a connection with the new eNodeB.
 
-<img src="https://user-images.githubusercontent.com/80008808/156179262-186f6c2e-b095-44b3-86bc-74d51cfec056.png" alt="drawing" width="500"/>  <img src="https://user-images.githubusercontent.com/80008808/156179269-b2f30821-2a97-4fe3-bdb6-d49648f6b4c9.png" alt="drawing" width="500"/>
+<img src="https://user-images.githubusercontent.com/80008808/156179262-186f6c2e-b095-44b3-86bc-74d51cfec056.png" alt="drawing" width="400"/>  <img src="https://user-images.githubusercontent.com/80008808/156179269-b2f30821-2a97-4fe3-bdb6-d49648f6b4c9.png" alt="drawing" width="400"/>
 
 
 
