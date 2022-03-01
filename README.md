@@ -1,6 +1,6 @@
 # LTE Network Simulation using NS3
 
-# Explanation of configuration of the first script lte_basic.cc
+## Explanation of configuration of the first script lte_basic.cc
 
 1. Create a script file in c++ called lte_netw_config.cc in which we will code the configurations
 2. Set a group of node objects, and add methods to make them behave like eNodeBs or UEs
