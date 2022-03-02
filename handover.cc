@@ -106,7 +106,7 @@ void ThroughputMonitor (FlowMonitorHelper *fmhelper, Ptr<FlowMonitor> flowMon,Gn
     for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator stats = flowStats.begin (); stats != flowStats.end (); ++stats)
     {
       Ipv4FlowClassifier::FiveTuple fiveTuple = classing->FindFlow (stats->first);
-       if (fiveTuple.sourceAddress == Ipv4Address("1.0.0.2") /*|| fiveTuple.sourceAddress == Ipv4Address("7.0.0.2") || fiveTuple.sourceAddress == Ipv4Address("7.0.0.3")*/)
+       if (fiveTuple.sourceAddress == Ipv4Address("1.0.0.2") 
       {
       
       std::cout<<"Flow ID     : " << stats->first <<" ; "<< fiveTuple.sourceAddress <<" -----> "<<fiveTuple.destinationAddress<<std::endl;
@@ -128,7 +128,6 @@ void ThroughputMonitor (FlowMonitorHelper *fmhelper, Ptr<FlowMonitor> flowMon,Gn
       }
     }
       Simulator::Schedule(Seconds(0.2  ),&ThroughputMonitor, fmhelper, flowMon,DataSet);
-   //if(flowToXml)
       {
   flowMon->SerializeToXmlFile ("ThroughputMonitor.xml", true, true);
       }
@@ -156,15 +155,13 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::LteEnbRrc::SrsPeriodicity", UintegerValue(320));
   Config::SetDefault ("ns3::LteHelper::UseIdealRrc", BooleanValue (false));
 
-  // Command line arguments
+  // Command line arguments, putting data from cmd
   CommandLine cmd;
   cmd.AddValue ("numberOfUes", "Number of UEs", numberOfUes);
   cmd.AddValue ("numberOfEnbs", "Number of eNodeBs", numberOfEnbs);
   cmd.AddValue ("simTime", "Total duration of the simulation (in seconds)", simTime);
   cmd.Parse (argc, argv);
   
-
-
   Ptr<LteHelper> lteHelper = CreateObject<LteHelper> ();
   Ptr<PointToPointEpcHelper> epcHelper = CreateObject<PointToPointEpcHelper> ();
   lteHelper->SetEpcHelper (epcHelper);
@@ -192,7 +189,6 @@ main (int argc, char *argv[])
   Ipv4InterfaceContainer internetIpIfaces = ipv4h.Assign (internetDevices);
   Ipv4Address remoteHostAddr = internetIpIfaces.GetAddress (1);
 
-
   // Routing of the Internet Host (towards the LTE network)
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4StaticRouting> remoteHostStaticRouting = ipv4RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv4> ());
@@ -205,15 +201,6 @@ main (int argc, char *argv[])
   ueNodes.Create (numberOfUes);
 
   // Install Mobility Model
-  // Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  // for (uint16_t i = 0; i < numberOfEnbs; i++)
-  //   {
-  //     positionAlloc->Add (Vector (distance * 2 * i - distance, 0, 0));
-  //   }
-  // for (uint16_t i = 0; i < numberOfUes; i++)
-  //   {
-  //     positionAlloc->Add (Vector (0, 0, 0));
-  //   }
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
                                  "MinX", DoubleValue (10.0),
@@ -229,7 +216,6 @@ main (int argc, char *argv[])
   mobility.Install (enbNodes);
   
 
-
   // Install LTE Devices in eNB and UEs
   NetDeviceContainer enbLteDevs = lteHelper->InstallEnbDevice (enbNodes);
   NetDeviceContainer ueLteDevs = lteHelper->InstallUeDevice (ueNodes);
@@ -238,7 +224,6 @@ main (int argc, char *argv[])
   internet.Install (ueNodes);
   Ipv4InterfaceContainer ueIpIfaces;
   ueIpIfaces = epcHelper->AssignUeIpv4Address (NetDeviceContainer (ueLteDevs));
-
 
   // Attach all UEs to the first eNodeB
   // for (uint16_t i = 0; i < numberOfUes; i++)
@@ -267,8 +252,6 @@ main (int argc, char *argv[])
       // Set the default gateway for the UE
       Ptr<Ipv4StaticRouting> ueStaticRouting = ipv4RoutingHelper.GetStaticRouting (ue->GetObject<Ipv4> ());
       ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress (), 1);
-
-      //for (uint32_t b = 0; b < numBearersPerUe; ++b)
         {
           ++dlPort;
           ++ulPort;
@@ -312,39 +295,39 @@ main (int argc, char *argv[])
 
   // Add X2 inteface
     lteHelper->AddX2Interface (enbNodes);
-
-  lteHelper->EnablePhyTraces ();
-  lteHelper->EnableMacTraces ();
-  lteHelper->EnableRlcTraces ();
-  lteHelper->EnablePdcpTraces ();
-   Ptr<RadioBearerStatsCalculator> rlcStats = lteHelper->GetRlcStats ();
-   rlcStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.02)));
-  Ptr<RadioBearerStatsCalculator> pdcpStats = lteHelper->GetPdcpStats ();
-  pdcpStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.02)));
+    lteHelper->EnablePhyTraces ();
+    lteHelper->EnableMacTraces ();
+    lteHelper->EnableRlcTraces ();
+    lteHelper->EnablePdcpTraces ();
+    Ptr<RadioBearerStatsCalculator> rlcStats = lteHelper->GetRlcStats ();
+    rlcStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.02)));
+    Ptr<RadioBearerStatsCalculator> pdcpStats = lteHelper->GetPdcpStats ();
+    pdcpStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.02)));
 
 
 
   // connect custom trace sinks for RRC connection establishment and handover notification
-  Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/ConnectionEstablished",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/ConnectionEstablished",
                    MakeCallback (&NotifyConnectionEstablishedEnb));
-  Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/ConnectionEstablished",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/ConnectionEstablished",
                    MakeCallback (&NotifyConnectionEstablishedUe));
-  Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/HandoverStart",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/HandoverStart",
                    MakeCallback (&NotifyHandoverStartEnb));
-  Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/HandoverStart",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/HandoverStart",
                    MakeCallback (&NotifyHandoverStartUe));
-  Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/HandoverEndOk",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteEnbRrc/HandoverEndOk",
                    MakeCallback (&NotifyHandoverEndOkEnb));
-  Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/HandoverEndOk",
+    Config::Connect ("/NodeList/*/DeviceList/*/LteUeRrc/HandoverEndOk",
                    MakeCallback (&NotifyHandoverEndOkUe));
 
 
-  Simulator::Stop (Seconds (simTime));
-  AnimationInterface anim ("lte2.xml");
-  //anim.EnablePacketMetadata ();
-  anim.SetMaxPktsPerTraceFile (100000000000);
-  anim.SetMobilityPollInterval(Seconds(1));
-  //anim.EnablePacketMetadata(true);
+    Simulator::Stop (Seconds (simTime));
+   
+   // Generate xml file for visual display of scerario in NetAnim  
+   AnimationInterface anim ("lte2.xml");
+   anim.SetMaxPktsPerTraceFile (100000000000);
+   anim.SetMobilityPollInterval(Seconds(1));
+  
     std::string fileNameWithNoExtension = "FlowVSThroughput_";
     std::string graphicsFileName        = fileNameWithNoExtension + ".png";
     std::string plotFileName            = fileNameWithNoExtension + ".plt";
@@ -355,42 +338,38 @@ main (int argc, char *argv[])
     Gnuplot gnuplot (graphicsFileName);
     gnuplot.SetTitle (plotTitle);
 
-    // Make the graphics file, which the plot file will be when it
-    // is used with Gnuplot, be a PNG file.
+    // Make the graphics file, which the plot file will be when it is used with Gnuplot, be a PNG file.
     gnuplot.SetTerminal ("png");
 
     // Set the labels for each axis.
     gnuplot.SetLegend ("Flow", "Throughput");
 
-     
-   Gnuplot2dDataset dataset;
-   dataset.SetTitle (dataTitle);
-   dataset.SetStyle (Gnuplot2dDataset::LINES_POINTS);
+    Gnuplot2dDataset dataset;
+    dataset.SetTitle (dataTitle);
+    dataset.SetStyle (Gnuplot2dDataset::LINES_POINTS);
 
-  //flowMonitor declaration
-  FlowMonitorHelper fmHelper;
-  Ptr<FlowMonitor> allMon = fmHelper.InstallAll();
-  allMon->CheckForLostPackets ();
-  // call the flow monitor function
-  ThroughputMonitor(&fmHelper, allMon, dataset); 
+   //flowMonitor declaration
+   FlowMonitorHelper fmHelper;
+   Ptr<FlowMonitor> allMon = fmHelper.InstallAll();
+   allMon->CheckForLostPackets ();
+   // call the flow monitor function
+   ThroughputMonitor(&fmHelper, allMon, dataset); 
   
+   // trace file, for data extraction
    AsciiTraceHelper ascii;
-  p2ph.EnableAsciiAll (ascii.CreateFileStream ("tracehandover.tr"));
+   p2ph.EnableAsciiAll (ascii.CreateFileStream ("tracehandover.tr"));
 
-  Simulator::Run ();
+   Simulator::Run ();
 
-  //Gnuplot ...continued
-  gnuplot.AddDataset (dataset);
-  // Open the plot file.
-  std::ofstream plotFile (plotFileName.c_str());
-  // Write the plot file.
-  gnuplot.GenerateOutput (plotFile);
-  // Close the plot file.
-  plotFile.close ();
-
-  // GtkConfigStore config;
-  // config.ConfigureAttributes ();
-
-  Simulator::Destroy ();
-  return 0;
+   //Gnuplot ...continued
+   gnuplot.AddDataset (dataset);
+   // Open the plot file.
+   std::ofstream plotFile (plotFileName.c_str());
+   // Write the plot file.
+   gnuplot.GenerateOutput (plotFile);
+   // Close the plot file.
+   plotFile.close ();
+   
+   Simulator::Destroy ();
+   return 0;
 }
