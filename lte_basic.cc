@@ -12,6 +12,7 @@ int main (int argc, char *argv[])
 {
   CommandLine cmd;
 
+  //Declaration of a new object LteHelper, to create nodes
   Ptr<LteHelper> lteHelper = CreateObject<LteHelper> ();
  
 
@@ -23,23 +24,17 @@ int main (int argc, char *argv[])
   pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
   pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
 
-
-  //Create Node objects for the eNB(s) and the UEs:
-
+  //Create Node objects for the eNB(s) and the UEs. Here nodes are emptz
   NodeContainer enbNodes;
   enbNodes.Create (1);
   NodeContainer ueNodes;
   ueNodes.Create (20);
 
-  //Note that the above Node instances at this point still don’t have an LTE protocol stack installed; they’re just empty nodes.
-
   //Configure the Mobility model for all the nodes:
-
   MobilityHelper mobility;
-//---------Set Mobility---------------------------------
+  //---------Set Mobility---------------------------------
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (enbNodes);
-  //mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
   "MinX", DoubleValue (0.0),
   "MinY", DoubleValue (0.0),
@@ -52,27 +47,24 @@ int main (int argc, char *argv[])
   mobility.Install (ueNodes);
 
   //Install an LTE protocol stack on the eNB(s):
-
   NetDeviceContainer enbDevs;
   enbDevs = lteHelper->InstallEnbDevice (enbNodes);
 
   //Install an LTE protocol stack on the UEs:
-
   NetDeviceContainer ueDevs;
   ueDevs = lteHelper->InstallUeDevice (ueNodes);
 
   //Attach the UEs to an eNB. This will configure each UE according to the eNB configuration, and create an RRC connection between them:
-
   lteHelper->Attach (ueDevs, enbDevs.Get (0));
+  
 
-  //Activate a data radio bearer between each UE and the eNB it is attached to:
-
+  /*** 
+   * Activate a data radio bearer between each UE and the eNB it is attached to: 
+   * This method will also activate two saturation traffic generators for that bearer, one in uplink and one in downlink.
+   ***/
   enum EpsBearer::Qci q = EpsBearer::GBR_CONV_VOICE;
   EpsBearer bearer (q);
   lteHelper->ActivateDataRadioBearer (ueDevs, bearer);
-
-  //this method will also activate two saturation traffic generators for that bearer, one in uplink and one in downlink.
-
 
   //Set the stop time
   Simulator::Stop (Seconds (20));
@@ -82,20 +74,16 @@ int main (int argc, char *argv[])
     lteHelper->EnableMacTraces ();
     lteHelper->EnableRlcTraces ();
 
-  //   Ptr<RadioBearerStatsCalculator> rlcStats = lteHelper->GetRlcStats ();
-  // rlcStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.05)));
-  // Ptr<RadioBearerStatsCalculator> pdcpStats = lteHelper->GetPdcpStats ();
-  // pdcpStats->SetAttribute ("EpochDuration", TimeValue (Seconds (0.05)));
-
+  
   //Run the simulation:
     AnimationInterface anim ("lte1.xml");
     anim.SetMobilityPollInterval(Seconds(1.00));
     anim.SetMaxPktsPerTraceFile (100000000000);
-  // anim.EnablePacketMetadata(true);
-  
+
+  //Adding function to generate tr file in which data can be extracted to plot the metric of performance, Qos
    AsciiTraceHelper ascii;
-  pointToPoint.EnableAsciiAll (ascii.CreateFileStream ("myfirst.tr"));
-  Simulator::Run ();
-  Simulator::Destroy ();
-  return 0;
+   pointToPoint.EnableAsciiAll (ascii.CreateFileStream ("myfirst.tr"));
+   Simulator::Run ();
+   Simulator::Destroy ();
+   return 0;
 }
