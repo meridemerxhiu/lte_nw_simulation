@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
   "MinX", DoubleValue (0.0),
   "MinY", DoubleValue (0.0),
   "DeltaX", DoubleValue (5.0),
-  "DeltaY", DoubleValue (10.0),
+  "DeltaY", DoubleValue (1000.0),
   "GridWidth", UintegerValue (3),
   "LayoutType", StringValue ("RowFirst"));
   mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
